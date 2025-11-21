@@ -1,0 +1,369 @@
+:root {
+  --primary: #f4b000;
+  --primary-dark: #c78d00;
+  --bg: #0f172a;
+  --card-bg: #0b1120;
+  --accent: #38bdf8;
+  --text-main: #f9fafb;
+  --text-muted: #9ca3af;
+  --border-soft: #1f2937;
+  --radius-xl: 18px;
+  --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.55);
+  --transition-fast: 200ms ease;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background: radial-gradient(circle at top, #1e293b, #020617);
+  color: var(--text-main);
+}
+
+.app-root {
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.main-shell {
+  width: 100%;
+  max-width: 1200px;
+  margin: 24px;
+  padding: 24px;
+  border-radius: 24px;
+  background: radial-gradient(circle at top, #0b1120, #020617);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header / brand */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: conic-gradient(from 180deg, #facc15, #f97316, #f97316, #facc15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: #111827;
+  font-size: 18px;
+}
+
+.brand-text-title {
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 18px;
+}
+
+.tagline {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.16em;
+}
+
+/* Generic card / sections */
+
+.section-card {
+  background: linear-gradient(135deg, #020617, #020617 55%, #111827);
+  border-radius: var(--radius-xl);
+  padding: 20px 22px;
+  border: 1px solid var(--border-soft);
+}
+
+.section-title {
+  font-size: 22px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-subtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  background: rgba(56, 189, 248, 0.08);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.18);
+}
+
+/* Buttons */
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #111827;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 14px 30px rgba(202, 138, 4, 0.45);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+    filter var(--transition-fast);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+  box-shadow: 0 16px 38px rgba(202, 138, 4, 0.6);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-radius: 999px;
+  padding: 8px 14px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* Upload area */
+
+.upload-area {
+  margin-top: 14px;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px dashed rgba(148, 163, 184, 0.6);
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.upload-input {
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.file-meta {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Layout helpers */
+
+.actions-row {
+  margin-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.actions-row-right {
+  display: flex;
+  gap: 10px;
+}
+
+
+
+/* ===== Printable FOOD CHECK-LIST table ===== */
+
+.print-sheet {
+  background: #ffffff;
+  color: #000000;
+  padding: 8mm;
+  border-radius: 8px;
+  border: 1px solid #000;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.food-checklist-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  table-layout: fixed;
+}
+
+.food-checklist-table th,
+.food-checklist-table td {
+  border: 1px solid #000;
+  padding: 3px 4px;
+  vertical-align: top;
+}
+
+/* Top header row */
+
+.table-header {
+  font-weight: 700;
+  text-align: center;
+}
+
+.company-cell {
+  text-align: left;
+}
+
+.brand-cell {
+  text-align: right;
+  font-size: 12px;
+}
+
+.brand-sub {
+  font-size: 9px;
+  font-weight: 400;
+}
+
+.title-cell {
+  text-align: center;
+}
+
+.food-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  background: #ffd60a;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 11px;
+  border: 1px solid #000;
+}
+
+/* Second header row */
+
+.date-head {
+  width: 14%;
+}
+
+.menu-head {
+  text-align: center;
+}
+
+.wastage-head {
+  width: 6%; /* small column for wastage */
+}
+
+/* Body cells */
+
+.date-cell {
+  text-align: left;
+  font-weight: 600;
+  font-size: 10px;
+  padding-top: 4px;
+}
+
+.item-col {
+  width: 26%;
+}
+
+.item-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.item-checkbox {
+  transform: scale(0.9);
+}
+
+.wastage-cell {
+  text-align: center;
+  font-size: 9px;
+  padding: 0 2px;
+}
+
+/* Footer row (Time / Handler / Supervisor) */
+
+.footer-row .footer-cell {
+  font-size: 9px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  border-top: 1px solid #000;
+}
+
+/* Strong separator line under each day's block */
+
+.date-cell,
+.wastage-cell,
+.footer-row .footer-cell {
+  border-bottom: 2px solid #000;
+}
+
+/* ===== Meal sheet container (for multi-page printing) ===== */
+
+.meal-sheet {
+  margin-bottom: 24px;
+}
+
+.page-break {
+  margin-top: 24px;
+}
+
+/* ===== Print styles ===== */
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 10mm;
+  }
+
+  body {
+    background: #ffffff !important;
+  }
+
+  .app-root,
+  .main-shell {
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+    border-radius: 0;
+    background: #ffffff;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-sheet {
+    border: none;
+    padding: 0;
+  }
+
+  .food-checklist-table {
+    font-size: 9px;
+  }
+
+  .food-checklist-table th,
+  .food-checklist-table td {
+    padding: 2px 3px;
+  }
+
+  /* start each meal's sheet on a new page when printing */
+  .page-break {
+    page-break-before: always;
+  }
+}

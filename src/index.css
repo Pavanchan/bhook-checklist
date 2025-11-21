@@ -1,0 +1,200 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+/* ===== Printable sheet styled like your FOOD CHECK-LIST ===== */
+
+.print-sheet {
+  background: #ffffff;
+  color: #000000;
+  padding: 8mm;
+  border-radius: 8px;
+  border: 1px solid #000;
+}
+
+.food-checklist-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  table-layout: fixed;
+}
+
+.food-checklist-table th,
+.food-checklist-table td {
+  border: 1px solid #000;
+  padding: 3px 4px;
+  vertical-align: top;
+}
+
+/* Top header row */
+.table-header {
+  font-weight: 700;
+  text-align: center;
+}
+
+.company-cell {
+  text-align: left;
+}
+
+.brand-cell {
+  text-align: right;
+  font-size: 12px;
+}
+
+.brand-sub {
+  font-size: 9px;
+  font-weight: 400;
+}
+
+.title-cell {
+  text-align: center;
+}
+
+.food-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  background: #ffd60a;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 11px;
+  border: 1px solid #000;
+}
+
+/* Second header row */
+.date-head {
+  width: 12%;
+}
+
+.menu-head {
+  text-align: center;
+}
+
+.wastage-head {
+  width: 10%;
+}
+
+/* Body cells */
+.date-cell {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  text-align: center;
+  font-weight: 600;
+}
+
+.item-col {
+  width: 26%;
+}
+
+.item-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.item-checkbox {
+  transform: scale(0.9);
+}
+
+.wastage-cell {
+  text-align: center;
+}
+
+/* Footer row inside each date block */
+.footer-row .footer-cell {
+  font-size: 10px;
+}
+
+/* ===== Print styles ===== */
+
+@media print {
+  body {
+    background: #ffffff !important;
+  }
+
+  .app-root,
+  .main-shell {
+    margin: 0;
+    padding: 0;
+    box-shadow: none;
+    border-radius: 0;
+    background: #ffffff;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-sheet {
+    border: none;
+    padding: 0;
+  }
+
+  .food-checklist-table {
+    font-size: 10px;
+  }
+}
+
