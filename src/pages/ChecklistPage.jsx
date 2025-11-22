@@ -1,5 +1,5 @@
 // src/pages/ChecklistPage.jsx
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMenu } from "../context/MenuContext.jsx";
 import html2canvas from "html2canvas";
@@ -26,9 +26,21 @@ const MEAL_LABEL = {
 };
 
 export default function ChecklistPage() {
-  const { menu, company } = useMenu();
+  const { menu, company, setMenu } = useMenu();
   const navigate = useNavigate();
-  const wrapperRef = useRef(null); // will contain all printable sheets
+  const wrapperRef = useRef(null); // contains all sheets
+
+  // ---- Edit mode state ----
+  const [isEditing, setIsEditing] = useState(false);
+  const [localMenu, setLocalMenu] = useState(menu);
+
+  // keep local copy in sync if menu changes from elsewhere
+  useEffect(() => {
+    setLocalMenu(menu);
+  }, [menu]);
+
+  // use localMenu while editing, otherwise the original menu
+  const effectiveMenu = isEditing ? localMenu : menu;
 
   if (!menu) {
     return (
@@ -49,12 +61,12 @@ export default function ChecklistPage() {
     );
   }
 
-  const orderedDays = DAYS_ORDER.filter((d) => menu[d]);
-  const days = orderedDays.length ? orderedDays : Object.keys(menu);
+  const orderedDays = DAYS_ORDER.filter((d) => effectiveMenu[d]);
+  const days = orderedDays.length ? orderedDays : Object.keys(effectiveMenu);
 
-  // Determine which meals actually have items
+  // Which meals actually have data?
   const mealsToRender = MEAL_ORDER.filter((key) =>
-    Object.values(menu).some(
+    Object.values(effectiveMenu).some(
       (day) => Array.isArray(day?.[key]) && day[key].length > 0
     )
   );
@@ -83,28 +95,74 @@ export default function ChecklistPage() {
     window.print();
   };
 
-  // Download ALL sheets as a single long PNG image
-  const handleDownloadImage = async () => {
-    if (!wrapperRef.current) return;
+  // ---- Editing helpers ----
+  const handleItemChange = (dayKey, mealKey, itemIndex, newValue) => {
+    setLocalMenu((prev) => {
+      const day = { ...(prev[dayKey] || {}) };
+      const items = [...(day[mealKey] || [])];
+      items[itemIndex] = newValue;
+      day[mealKey] = items;
+      return { ...prev, [dayKey]: day };
+    });
+  };
 
-    try {
-      const canvas = await html2canvas(wrapperRef.current, {
+  const startEditing = () => {
+    setLocalMenu(menu); // just in case
+    setIsEditing(true);
+  };
+
+  const saveEditing = () => {
+    setMenu(localMenu);
+    setIsEditing(false);
+  };
+
+  const cancelEditing = () => {
+    setLocalMenu(menu);
+    setIsEditing(false);
+  };
+
+  // ---- Download ALL sheets as a single tall PNG ----
+ // Download EACH meal sheet as its own PNG
+const handleDownloadImage = async () => {
+  if (!wrapperRef.current) return;
+
+  try {
+    const sheets = wrapperRef.current.querySelectorAll(".meal-sheet");
+
+    if (!sheets.length) {
+      alert("No sheets found to export.");
+      return;
+    }
+
+    for (let i = 0; i < sheets.length; i++) {
+      const sheet = sheets[i];
+
+      // meal key from data attribute (breakfast / lunch / snacks / dinner)
+      const mealKey = sheet.getAttribute("data-meal") || `sheet-${i + 1}`;
+      const mealLabel = MEAL_LABEL[mealKey] || `SHEET-${i + 1}`;
+
+      const canvas = await html2canvas(sheet, {
         scale: 2,
         useCORS: true,
       });
+
       const dataUrl = canvas.toDataURL("image/png");
 
       const link = document.createElement("a");
       link.href = dataUrl;
-      link.download = `${company || "bhook"}-food-checklist.png`;
+      link.download = `${company || "bhook"}-${mealLabel
+        .toLowerCase()
+        .replace(/\s+/g, "-")}.png`;
       link.click();
-    } catch (err) {
-      console.error("PNG export failed:", err);
-      alert("Could not generate image. Please try again.");
     }
-  };
+  } catch (err) {
+    console.error("PNG export failed:", err);
+    alert("Could not generate images. Please try again.");
+  }
+};
 
-  // Download each meal-sheet as a separate page in a single PDF
+
+  // ---- Download each sheet as one page in a PDF ----
   const handleDownloadPDF = async () => {
     if (!wrapperRef.current) return;
 
@@ -127,7 +185,7 @@ export default function ChecklistPage() {
 
         const imgWidth = pageWidth;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        const y = Math.max(0, (pageHeight - imgHeight) / 2); // vertical centering
+        const y = Math.max(0, (pageHeight - imgHeight) / 2);
 
         pdf.addImage(imgData, "PNG", 0, y, imgWidth, imgHeight);
 
@@ -150,9 +208,9 @@ export default function ChecklistPage() {
         className="no-print"
         style={{
           display: "flex",
-          gap: 12,
-          marginBottom: 12,
           flexWrap: "wrap",
+          gap: 10,
+          marginBottom: 12,
         }}
       >
         <button
@@ -162,29 +220,67 @@ export default function ChecklistPage() {
         >
           ← Back to upload
         </button>
-        <button className="btn-primary" type="button" onClick={handlePrint}>
+
+        {/* Edit controls */}
+        {!isEditing ? (
+          <button className="btn-ghost" type="button" onClick={startEditing}>
+            ✏️ Edit items
+          </button>
+        ) : (
+          <>
+            <button className="btn-primary" type="button" onClick={saveEditing}>
+              ✅ Save changes
+            </button>
+            <button className="btn-ghost" type="button" onClick={cancelEditing}>
+              ✖ Cancel
+            </button>
+          </>
+        )}
+
+        {/* Export controls – disabled while editing */}
+        <button
+          className="btn-primary"
+          type="button"
+          onClick={handlePrint}
+          disabled={isEditing}
+          style={isEditing ? { opacity: 0.6, cursor: "not-allowed" } : {}}
+        >
           Print / Save as PDF (Browser)
         </button>
-        <button className="btn-ghost" type="button" onClick={handleDownloadPDF}>
+        <button
+          className="btn-ghost"
+          type="button"
+          onClick={handleDownloadPDF}
+          disabled={isEditing}
+          style={isEditing ? { opacity: 0.6, cursor: "not-allowed" } : {}}
+        >
           Download PDF
         </button>
-        <button className="btn-ghost" type="button" onClick={handleDownloadImage}>
+        <button
+          className="btn-ghost"
+          type="button"
+          onClick={handleDownloadImage}
+          disabled={isEditing}
+          style={isEditing ? { opacity: 0.6, cursor: "not-allowed" } : {}}
+        >
           Download as Image (PNG)
         </button>
       </div>
 
-      {/* Wrapper that will be captured for PNG/PDF (no controls inside) */}
+      {/* Wrapper captured for PNG/PDF */}
       <div ref={wrapperRef}>
         {mealsToRender.map((mealKey, index) => {
           const label = MEAL_LABEL[mealKey];
 
           return (
-            <div
-              key={mealKey}
-              className={`print-sheet meal-sheet ${
-                index > 0 ? "page-break" : ""
-              }`}
-            >
+                <div
+      key={mealKey}
+      className={`print-sheet meal-sheet ${
+        index > 0 ? "page-break" : ""
+      }`}
+      data-meal={mealKey}
+    >
+
               <table className="food-checklist-table">
                 <thead>
                   {/* Top header row */}
@@ -215,19 +311,12 @@ export default function ChecklistPage() {
 
                 <tbody>
                   {days.map((dayKey) => {
-                    const items = (menu[dayKey]?.[mealKey] || []).filter(Boolean);
+                    const items = effectiveMenu[dayKey]?.[mealKey] || [];
                     if (!items.length) return null;
 
                     const columnCount = 3;
                     const chunkSize =
                       Math.ceil(items.length / columnCount) || 1;
-
-                    const cols = [];
-                    for (let c = 0; c < columnCount; c++) {
-                      cols.push(
-                        items.slice(c * chunkSize, (c + 1) * chunkSize)
-                      );
-                    }
 
                     const rowsCount = chunkSize;
 
@@ -249,19 +338,51 @@ export default function ChecklistPage() {
                               )}
 
                               {/* 3 columns of menu items */}
-                              {cols.map((col, colIndex) => (
-                                <td key={colIndex} className="item-col">
-                                  {col[rowIndex] ? (
-                                    <label className="item-label">
-                                      <input
-                                        type="checkbox"
-                                        className="item-checkbox"
-                                      />
-                                      <span>{col[rowIndex]}</span>
-                                    </label>
-                                  ) : null}
-                                </td>
-                              ))}
+                              {Array.from({ length: columnCount }).map(
+                                (_, colIndex) => {
+                                  const globalIndex =
+                                    colIndex * chunkSize + rowIndex;
+                                  const value = items[globalIndex];
+
+                                  // in display mode, skip empty cells
+                                  if (!value && !isEditing) {
+                                    return (
+                                      <td
+                                        key={colIndex}
+                                        className="item-col"
+                                      ></td>
+                                    );
+                                  }
+
+                                  return (
+                                    <td key={colIndex} className="item-col">
+                                      {isEditing ? (
+                                        <input
+                                          className="edit-input"
+                                          value={value || ""}
+                                          onChange={(e) =>
+                                            handleItemChange(
+                                              dayKey,
+                                              mealKey,
+                                              globalIndex,
+                                              e.target.value
+                                            )
+                                          }
+                                          placeholder="(empty)"
+                                        />
+                                      ) : value ? (
+                                        <label className="item-label">
+                                          <input
+                                            type="checkbox"
+                                            className="item-checkbox"
+                                          />
+                                          <span>{value}</span>
+                                        </label>
+                                      ) : null}
+                                    </td>
+                                  );
+                                }
+                              )}
 
                               {/* Wastage cell spans all rows + footer row */}
                               {rowIndex === 0 && (
